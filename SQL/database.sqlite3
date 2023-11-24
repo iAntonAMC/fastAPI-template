@@ -1,0 +1,47 @@
+.mode column
+.headers on
+PRAGMA FOREIGN_KEYS = on;
+
+CREATE TABLE clients (
+    id_client INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    client_name VARCHAR(150) NOT NULL,
+    client_lastname VARCHAR(150) DEFAULT NULL,
+    client_email VARCHAR(150) NOT NULL CHECK (client_email LIKE '%@%.%') UNIQUE,
+    client_password VARCHAR(150) NOT NULL
+);
+CREATE UNIQUE INDEX email_pass ON clients(client_email, client_password);
+CREATE UNIQUE INDEX id_name ON clients(id_client, client_name, client_lastname);
+
+CREATE TABLE products (
+    id_product INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    product_sku VARCHAR(150) UNIQUE NOT NULL,
+    product_name VARCHAR(150) NOT NULL,
+    product_description VARCHAR(150),
+    product_price INTEGER CHECK (product_price > 0),
+    product_stock INTEGER DEFAULT NULL CHECK (product_stock > 0)
+);
+CREATE UNIQUE INDEX name_sku ON products(product_sku, product_name);
+CREATE INDEX sku_stock ON products(product_sku, product_name, product_stock);
+
+CREATE TABLE purchases (
+    id_purchase INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id_client INTEGER NOT NULL,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE purchased_detail (
+    id_detail INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id_purchase INTEGER NOT NULL,
+    id_product INTEGER NOT NULL,
+    number_of_products INTEGER NOT NULL CHECK (number_of_products > 0),
+    purchase_price INTEGER NOT NULL CHECK (purchase_price > 0),
+    total_price INTEGER DEFAULT NULL CHECK (total_price > 0)
+);
+
+INSERT INTO clients (client_name, client_lastname, client_email, client_password) VALUES 
+    ('Anton', 'Torres Fernández', 'anton@email.com', '1234'),
+    ('Alo', 'Córdova Azpeitia', 'alo@email.com', '1234');
+
+INSERT INTO products (product_sku, product_name, product_description, product_price, product_stock) VALUES
+    ('B01', 'Foto Botón', 'Pines de diversos Animes', 15, 100),
+    ('S3DC01', 'Sticker 3D Chico', 'Stickers de diversos Animes', 20, 100);
